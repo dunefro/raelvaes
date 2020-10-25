@@ -1,0 +1,8 @@
+- [ ] Deploy a simple application like kafka (ver 0.0.1)
+    - [ ] Flask API accepting json input to process for execution
+    - [ ] Sample structure of json/yaml
+       - [ ] The sample structure should be somewhat similar to docker-compose or kubernetes yaml, apiVersion should refer to the version of api we are using in flask
+       - [ ] terminology is based on railways
+    - [ ] Depending upon the input a simple algorithm that calculates the resources (AWS) that will be required.
+    - [ ] Templatising the algorithm result into terraform and ansible modules
+    - [ ] Executing the terraform module and ansible module as well.
