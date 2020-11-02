@@ -1,4 +1,4 @@
-from app import app
+from app.v1 import app
 
 @app.route('/admin/healthz')
 def admin_health():
