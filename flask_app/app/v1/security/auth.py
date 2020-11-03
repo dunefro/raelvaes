@@ -1,4 +1,4 @@
-from user import User
+from app.v1.security.user import User
 users = [
     User(1,'admin','LsadR3syRYtwVHH'),
     User(2,'developer','hAhGYeN4Ysz6wZC')
