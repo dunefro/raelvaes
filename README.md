@@ -31,3 +31,6 @@ Notes :
         }
         "password": "
     }
+ ```
+ # Architecture
+ ![alt text] (<Architecture.png>)
