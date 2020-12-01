@@ -33,4 +33,4 @@ Notes :
     }
  ```
  # Architecture
- ![alt text] (https://github.com/dunefro/raelvaes/blob/master/Architecture.png?raw=true)
+ ![](Architecture.png)
