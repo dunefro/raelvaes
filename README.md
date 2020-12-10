@@ -6,6 +6,22 @@
 5. /journey/start
 
 
+# New Implementation
+1. access.yaml hits the flask API and `Access` object is created.
+    a. `Access` class receives the complete details and tests the connection (ssh for now).
+    b. Creates an object with the same name as of the name in the metadata.
+2. After this `Platform_flask` API gets the `Platform` object
+    a. `Platform` class creates an object.
+    b. object looks for `Access` information
+    c. If `Access` information is present, perform the connection and use ansible module
+    d. If `Access` information is not present, pass the `Platform` object to server decider
+    e. After server decider pass the information to terraform
+    f. Terraform creates the required resources.
+    g. Ansible module deploys the required software.
+            
+
+
+
 
 Notes :
 1. First an authentication to the API with the username and the password
