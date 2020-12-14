@@ -30,7 +30,6 @@ class Access:
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             logging.info('SSH connection is started for the host {} for IP {}, trying to authenticate ... '.format(self.host.name , self.host.ip))
-            logging.info('{} {} {}'.format(self.host.ip,self.username,self.password))
             client.connect(self.host.ip, username=self.username, password=self.password)
             return True
         except paramiko.ssh_exception.AuthenticationException:
