@@ -1,27 +1,77 @@
 from app.v1 import app , api , Resource , JWT , jwt_required , reqparse , request , current_identity , os , base64 , Fernet , hashes , PBKDF2HMAC , salt
 from app.v1.security.auth import authenticate , identity
+import paramiko
+import base64
+import logging
+logging.basicConfig(level=logging.INFO)
 
 jwt = JWT(app , authenticate , identity)
 
 class Host:
 
-    def __init__(self,**kwargs):
-        self.name = kwargs['name']
-        self.ip = kwargs['ip']
+    def __init__(self, **kwargs):
+        self.name = kwargs.get('name')
+        self.ip = kwargs.get('ip')
 
 class Access:
 
+    def __init__(self, host , **kwargs):
+
+        self.method = kwargs.get('method')
+        self.username = kwargs.get('username')
+        self.password = kwargs.get('password')
+        self.server = kwargs.get('server')
+        self.host = host
+        if self.server != self.host.name:
+            raise Exception('Invalid Server Name: Server Name doesn\'t match the hostname')
+
+    def ssh(self):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            logging.info('SSH connection is started for the host {} for IP {}, trying to authenticate ... '.format(self.host.name , self.host.ip))
+            logging.info('{} {} {}'.format(self.host.ip,self.username,self.password))
+            client.connect(self.host.ip, username=self.username, password=self.password)
+            return True
+        except paramiko.ssh_exception.AuthenticationException:
+            logging.info('Authentication Failed. Host {} was not authenticated with the given credentials'.format(self.host.ip))
+        except paramiko.ssh_exception.SSHException:
+            logging.info('SSH Connection: Authentication was successful but some Exception occurred while connecting to {}.'.format(self.host.ip))
+        return False
+
+class Ticket:
+
     def __init__(self , name, host , access):
         self.name =  name
-        self.host = Host(host)
-        self.access = access
+        # **host unpacks the host dictionary and send to the __init__ object
+        self.host = Host(**host)
+        self.access = Access(self.host , **access)
 
+    def verify(self):
+        
+        if self.access.method == 'ssh':
+            return self.access.ssh()
+        return False
 
 class Access_flask(Resource):
 
     def post(self , name):
-        data = request.json()
-        print(data)
+
+        if request.is_json:
+            if request.json['kind'] != 'Ticket':
+                return {'Message': 'Only Ticket rquest are served to this endpoint not {}'.format(request.json['kind'])}
+            data = request.json
+
+            host = data['spec']['host']
+            access = data['spec']['access']
+            name = data['metadata']['name']
+            ticket = Ticket(name, host , access)
+            if ticket.verify():
+                return {'Message': 'Ticket with the name {} is successfully created'.format(ticket.name)}, 200
+            else:
+                return {'Mesage': 'Your Ticket is disapproved'} , 400
+        else:
+            return {'Message': 'Json request allowed only'} , 400
 
     # @staticmethod
     # def decrypt_text(text):
